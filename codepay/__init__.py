@@ -1,4 +1,4 @@
-from urllib.parse import urlencode
+from urllib.parse import quote
 from hashlib import md5
 
 
@@ -31,13 +31,15 @@ class CodePay:
         urls = ""
         for k in sorted(data.keys()):
             v = data[k]
+            if not isinstance(v, str):
+                v = str(v)
             if not v or k == "sign":
                 continue
             if signs:
                 urls += "&"
                 signs += "&"
             signs += f"{k}={v}"
-            urls += f"{k}={urlencode(v)}"
+            urls += f"{k}={quote(v.encode())}"
         sign = md5((signs + self.codepay_key).encode()).hexdigest()
         query = f"{urls}&sign={sign}"
         url = f"{self.api_host}?{query}"
